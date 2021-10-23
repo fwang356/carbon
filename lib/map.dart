@@ -18,15 +18,18 @@ class _MapState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
   final PointLatLng _start = const PointLatLng(33.748550, -84.391500);
   final PointLatLng _end = const PointLatLng(32.391980, -86.151160);
+  final PointLatLng _end2 = const PointLatLng(33.518589, -86.810356);
+  final PointLatLng _start2 = const PointLatLng(32.376541, -86.299660);
   Set<Polyline> _polylines = {};
 
   List<LatLng> polylineCoordinates = [];
+  List<LatLng> polylineCoordinates2 = [];
   PolylinePoints polylinePoints = PolylinePoints();
   String APIKey = "AIzaSyCsRS3jv8ZAOMI4vf02R5CfZH8KWmDj9Ss";
 
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(33.748550, -84.391500),
-        zoom: 1
+        zoom: 4
   );
 
   void onMapCreated(GoogleMapController controller) {
@@ -43,18 +46,39 @@ class _MapState extends State<MapPage> {
     );
 
     if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
+      for (var point in result.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
+      }
+    }
+
+    PolylineResult result2 = await
+    polylinePoints.getRouteBetweenCoordinates(
+        APIKey,
+        _start2,
+        _end2
+    );
+
+    if (result2.points.isNotEmpty) {
+      for (var point in result2.points) {
+        polylineCoordinates2.add(LatLng(point.latitude, point.longitude));
+      }
     }
 
     setState(() {
       Polyline polyline = Polyline(
-          polylineId: PolylineId("poly"),
+          polylineId: const PolylineId("poly"),
           color: MyColors.carbon,
           points: polylineCoordinates
       );
+
+
+      Polyline polyline2 = Polyline(
+        polylineId: const PolylineId("poly"),
+        color: const Color(0xFF7badab),
+        points: polylineCoordinates2
+      );
       _polylines.add(polyline);
+      _polylines.add(polyline2);
     });
   }
 
@@ -71,7 +95,8 @@ class _MapState extends State<MapPage> {
       body: GoogleMap(
         polylines: _polylines,
         initialCameraPosition: _kGooglePlex,
-        onMapCreated: onMapCreated
+        onMapCreated: onMapCreated,
+        mapType: MapType.normal
       ),
     );
   }
