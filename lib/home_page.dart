@@ -25,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
   PermissionStatus _permissionGranted;
   Location location = Location();
   String message = "Start Tracking!";
+  bool finished = false;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -38,12 +39,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startBluetooth() async {
-    String status = "";
-    status = bluetooth();
     while(true) {
-      if (status == "Finished") {
-        status = "";
-        status = bluetooth();
+      if (finished) {
+        finished = false;
+        bluetooth();
       }
     }
   }
@@ -125,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     });
-    return "Finished";
+    finished = true;
   }
 /*
   void _trackLocation() async {
