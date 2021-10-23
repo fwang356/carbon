@@ -1,9 +1,9 @@
 // @dart=2.9
 import 'signup.dart';
-import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'main.dart';
 
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthPage extends StatefulWidget {
@@ -88,7 +88,7 @@ class _AuthState extends State<AuthPage> {
 
                       ElevatedButton(
                           onPressed: () {
-                            // TODO: Login
+                            // TODO: Handle Login error (e.g. incorrect password)
                             auth.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
                             Navigator.pushAndRemoveUntil(
                               context,

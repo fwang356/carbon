@@ -1,7 +1,9 @@
 // @dart=2.9
+import 'package:carbon/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'utilities.dart';
 import 'main.dart';
 
 class SignupPage extends StatefulWidget {
@@ -16,6 +18,7 @@ class _SignupState extends State<SignupPage> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final mpgController = TextEditingController();
 
   List<String> fuelTypes = ['Gasoline', 'Diesel'];
   String _selectedFuel;
@@ -71,11 +74,12 @@ class _SignupState extends State<SignupPage> {
                           )
                       ),
 
-                      const Padding(
-                          padding: EdgeInsets.only(left: 20, right: 20, top: 12),
+                      Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20, top: 12),
                           child: TextField(
+                              controller: mpgController,
                               keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: "Car's MPG",
                               )
@@ -102,12 +106,15 @@ class _SignupState extends State<SignupPage> {
                       ),
 
                       ElevatedButton(
-                          onPressed: () {
-                            // TODO: Sign Up
-                            auth.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+                          onPressed: () async {
+                            // TODO: Handle Signup errors (e.g. password too short, )
+                            double mpg = double.parse(mpgController.text);
+
+                            Utilities.createAndLoginUser(emailController.text, passwordController.text, mpg, _selectedFuel);
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => MyHomePage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const MyHomePage()),
                                   (Route<dynamic> route) => false,
                             );
                           },

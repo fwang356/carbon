@@ -37,9 +37,9 @@ class AppState extends State<MyApp> {
           FirebaseAuth auth = FirebaseAuth.instance;
 
           if (auth.currentUser != null) {
-            return HomePage("Car-Bon: Track Your Carbon Emissions");
+            return HomePageApp("Car-Bon: Track Your Carbon Emission!");
           } else {
-            return LoginPage();
+            return LoginPageApp();
           }
         }
 
@@ -49,7 +49,7 @@ class AppState extends State<MyApp> {
     );
   }
 
-  MaterialApp LoginPage() {
+  MaterialApp LoginPageApp() {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -67,7 +67,7 @@ class AppState extends State<MyApp> {
     );
   }
 
-  MaterialApp HomePage(String title) {
+  MaterialApp HomePageApp(String title) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
