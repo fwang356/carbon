@@ -1,13 +1,12 @@
 // @dart=2.9
 import 'package:carbon/auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
-import 'main.dart';
 import 'help.dart';
 import 'trips.dart';
 import 'drive.dart';
@@ -21,7 +20,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FlutterBlue flutterBlue = FlutterBlue.instance;
-  //DeviceIdentifier carID = "" as DeviceIdentifier;
+  String carID = "Forerunner 35";
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   LocationData _locationData;
@@ -45,11 +44,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return emissions * gallons;
   }
 
-  /*
   double bluetooth() {
     flutterBlue.connectedDevices.then((value) {
       for (BluetoothDevice d in value) {
-        if (d.id == carID) {
+        if (d.name == carID) {
           BluetoothDevice car = d;
           bool connected = true;
           Drive drive = Drive();
@@ -58,8 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
             connected = false;
             flutterBlue.connectedDevices.then((list) {
               for (BluetoothDevice device in list) {
-                if (device.id == carID) {
+                if (device.name == carID) {
                   connected = true;
+                  print("Connected");
                 }
               }
               if (connected) {
@@ -67,17 +66,22 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             });
           }
+
+          if (drive.waypoints.isNotEmpty) {
+            FirebaseFirestore firestore = FirebaseFirestore.instance;
+            FirebaseAuth auth = FirebaseAuth.instance;
+
+            firestore.collection("users").doc(auth.currentUser.uid).collection(
+                "drives")
+                .doc().set(drive.map());
+          }
         }
       }
     });
-    return distance;
   }
-   */
 
   void _trackLocation() async {
-    Drive drive = Drive();
-    drive.date = DateTime.now();
-
+    // TODO: Move initialization code
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
@@ -99,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Listen to scan results
     var subscription = flutterBlue.scanResults.listen((results) {
       for (ScanResult r in results) {
-        print(r.device);
+        // print(r.device);
       }
     });
 
@@ -120,7 +124,10 @@ class _MyHomePageState extends State<MyHomePage> {
     double lat1 = start.latitude;
     double lon1 = start.longitude;
     while (_tracking) {
-      drive.waypoints.add([lat1, lon1]);
+      drive.waypoints.add({
+        "lat": lat1,
+        "lon": lon1,
+      });
       await Future.delayed(const Duration(seconds: 5));
       LocationData curr = await location.getLocation();
       double lat2 = curr.latitude;
@@ -129,6 +136,15 @@ class _MyHomePageState extends State<MyHomePage> {
       lat1 = lat2;
       lon1 = lon2;
     }
+/*
+    if(drive.waypoints.isNotEmpty) {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      FirebaseAuth auth = FirebaseAuth.instance;
+
+      firestore.collection("users").doc(auth.currentUser.uid).collection(
+          "drives")
+          .doc().set(drive.map());
+    }*/
   }
 
   double _getDistance (double lat1, double lon1, double lat2, double lon2) {
