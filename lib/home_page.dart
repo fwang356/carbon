@@ -20,12 +20,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FlutterBlue flutterBlue = FlutterBlue.instance;
-  String carID = "Forerunner 35"; // TODO: Change into user's car name (carName)
+  String carID = "94:B2:CC:31:5B:55"; // TODO: Change into user's car name (carName)
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   Location location = Location();
   String message = "Start Tracking!";
-  bool finished = false;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -39,11 +38,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startBluetooth() async {
-    while(true) {
-      if (finished) {
-        finished = false;
-        bluetooth();
-      }
+    while (true) {
+      await bluetooth();
+      await Future.delayed(const Duration(seconds: 20));
     }
   }
 
@@ -58,74 +55,90 @@ class _MyHomePageState extends State<MyHomePage> {
     return emissions * gallons;
   }
 
-  String bluetooth() {
-    flutterBlue.connectedDevices.then((value) async {
-      for (BluetoothDevice d in value) {
-        if (d.name == carID) {
-          _serviceEnabled = await location.serviceEnabled();
+  Future<bool> bluetooth() async {
+
+    flutterBlue.startScan(timeout: const Duration(seconds: 4));
+
+    // TODO: Remove print
+    var subscription = flutterBlue.scanResults.listen((results) {
+           for (ScanResult r in results) {
+             print(r.device);
+           }
+         });
+
+    flutterBlue.stopScan();
+
+    List<BluetoothDevice> value = await flutterBlue.connectedDevices;
+    for (BluetoothDevice d in value) {
+      print(d.id);
+      if (d.id.toString() == carID) {
+        _serviceEnabled = await location.serviceEnabled();
+        if (!_serviceEnabled) {
+          _serviceEnabled = await location.requestService();
           if (!_serviceEnabled) {
-            _serviceEnabled = await location.requestService();
-            if (!_serviceEnabled) {
-              return;
-            }
-          }
-
-          _permissionGranted = await location.hasPermission();
-          if (_permissionGranted == PermissionStatus.denied) {
-            _permissionGranted = await location.requestPermission();
-            if (_permissionGranted != PermissionStatus.granted) {
-              return;
-            }
-          }
-
-          print("Connected");
-          bool connected = true;
-
-          Drive drive = Drive();
-          drive.date = DateTime.now();
-
-          LocationData start = await location.getLocation();
-          double lat1 = start.latitude;
-          double lon1 = start.longitude;
-          while (connected) {
-            connected = false;
-            print("Still connected");
-            await flutterBlue.connectedDevices.then((list) async {
-              for (BluetoothDevice device in list) {
-                if (device.name == carID) {
-                  connected = true;
-                }
-              }
-              if (connected) {
-                drive.waypoints.add({
-                  "lat": lat1,
-                  "lon": lon1,
-                });
-                await Future.delayed(const Duration(seconds: 5));
-                LocationData curr = await location.getLocation();
-                double lat2 = curr.latitude;
-                double lon2 = curr.longitude;
-                drive.distance += _getDistance(lat1, lon1, lat2, lon2);
-                lat1 = lat2;
-                lon1 = lon2;
-              }
-            });
-          }
-          print("Disconnected");
-
-          if (drive.waypoints.isNotEmpty) {
-            FirebaseFirestore firestore = FirebaseFirestore.instance;
-            FirebaseAuth auth = FirebaseAuth.instance;
-
-            firestore.collection("users").doc(auth.currentUser.uid).collection(
-                "drives")
-                .doc().set(drive.map());
+            return false;
           }
         }
+
+        _permissionGranted = await location.hasPermission();
+        if (_permissionGranted == PermissionStatus.denied) {
+          _permissionGranted = await location.requestPermission();
+          if (_permissionGranted != PermissionStatus.granted) {
+            return false;
+          }
+        }
+
+        print("Connected");
+        bool connected = true;
+
+        Drive drive = Drive();
+        drive.date = DateTime.now();
+
+        LocationData start = await location.getLocation();
+        double lat1 = start.latitude;
+        double lon1 = start.longitude;
+        while (connected) {
+          connected = false;
+          print("Still connected");
+          await flutterBlue.connectedDevices.then((list) async {
+            for (BluetoothDevice device in list) {
+              if (device.id.toString() == carID) {
+                connected = true;
+              }
+            }
+            if (connected) {
+              drive.waypoints.add({
+                "lat": lat1,
+                "lon": lon1,
+              });
+              await Future.delayed(const Duration(seconds: 5));
+              LocationData curr = await location.getLocation();
+              double lat2 = curr.latitude;
+              double lon2 = curr.longitude;
+              drive.distance += _getDistance(lat1, lon1, lat2, lon2);
+              lat1 = lat2;
+              lon1 = lon2;
+            }
+          });
+        }
+        print("Disconnected");
+
+        if (drive.waypoints.isNotEmpty) {
+          FirebaseFirestore firestore = FirebaseFirestore.instance;
+          FirebaseAuth auth = FirebaseAuth.instance;
+
+          firestore
+              .collection("users")
+              .doc(auth.currentUser.uid)
+              .collection("drives")
+              .doc()
+              .set(drive.map());
+        }
       }
-    });
-    finished = true;
+    }
+    return true;
   }
+
 /*
   void _trackLocation() async {
     Drive drive = Drive();
@@ -198,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   */
 
-  double _getDistance (double lat1, double lon1, double lat2, double lon2) {
+  double _getDistance(double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
     var c = cos;
     var a = 0.5 -
@@ -229,9 +242,9 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Center(
           child: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  /*
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              /*
                   Padding(
                     padding: const EdgeInsets.only(top: 1, bottom: 24),
                     child: ElevatedButton(
@@ -359,11 +372,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
               ),
 
-                  const Text(
-                      "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
-                      style: TextStyle(
-                          fontSize: 20,
-                          height: 1.5)), // TODO: Change distance to past week carbon emissions
+              const Text(
+                  "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
+                  style: TextStyle(
+                      fontSize: 20,
+                      height:
+                          1.5)), // TODO: Change distance to past week carbon emissions
 
               Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 8),
