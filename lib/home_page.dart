@@ -10,6 +10,7 @@ import 'dart:math';
 import 'main.dart';
 import 'help.dart';
 import 'trips.dart';
+import 'drive.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key key, this.title}) : super(key: key);
@@ -21,34 +22,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FlutterBlue flutterBlue = FlutterBlue.instance;
   //DeviceIdentifier carID = "" as DeviceIdentifier;
-  double distance = 0;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   LocationData _locationData;
   Location location = Location();
   bool _tracking = false;
   String message = "Start Tracking!";
-  List<List<double>> waypoints = [];
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
     const Color(0xff8f91cf),
   ];
 
-  /*void felixsmom() async {
-    _tracking = !_tracking;
-    while (_tracking) {
-      setState(() {
-        counter++;
-      });
-      await Future.delayed(Duration(seconds: 5));
-    }
-    setState(() {
-      counter = -1;
-    });
-  }*/
-
-  double calculate(double mpg, String gasType) {
+  double calculate(double distance, double mpg, String gasType) {
     double emissions;
     if (gasType == "Gasoline") {
       emissions = 8.887;
@@ -66,6 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
         if (d.id == carID) {
           BluetoothDevice car = d;
           bool connected = true;
+          Drive drive = Drive();
+          drive.date = DateTime.now();
           while (connected) {
             connected = false;
             flutterBlue.connectedDevices.then((list) {
@@ -87,6 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
    */
 
   void _trackLocation() async {
+    Drive drive = Drive();
+    drive.date = DateTime.now();
+
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
@@ -129,18 +120,18 @@ class _MyHomePageState extends State<MyHomePage> {
     double lat1 = start.latitude;
     double lon1 = start.longitude;
     while (_tracking) {
-      waypoints.add([lat1, lon1]);
+      drive.waypoints.add([lat1, lon1]);
       await Future.delayed(const Duration(seconds: 5));
       LocationData curr = await location.getLocation();
       double lat2 = curr.latitude;
       double lon2 = curr.longitude;
-      distance += _getDistance(lat1, lon1, lat2, lon2);
+      drive.distance += _getDistance(lat1, lon1, lat2, lon2);
       lat1 = lat2;
       lon1 = lon2;
     }
   }
 
-  double _getDistance(double lat1, double lon1, double lat2, double lon2) {
+  double _getDistance (double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
     var c = cos;
     var a = 0.5 -
@@ -299,11 +290,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
               ),
 
-              Text("Past Week's Carbon Emissions: $distance",
-                  style: const TextStyle(
-                      fontSize: 20,
-                      height:
-                          1.5)), // TODO: Change distance to past week carbon emissions
+                  const Text(
+                      "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
+                      style: TextStyle(
+                          fontSize: 20,
+                          height: 1.5)), // TODO: Change distance to past week carbon emissions
 
               Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 8),
