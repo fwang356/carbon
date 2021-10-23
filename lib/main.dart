@@ -37,7 +37,7 @@ class AppState extends State<MyApp> {
           FirebaseAuth auth = FirebaseAuth.instance;
 
           if (auth.currentUser != null) {
-            return HomePage("Car-Bon: Track Your Carbon Emission!");
+            return HomePage("Car-Bon: Track Your Carbon Emissions");
           } else {
             return LoginPage();
           }

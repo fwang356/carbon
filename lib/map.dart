@@ -1,7 +1,11 @@
 // @dart=2.9
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'home_page.dart';
+import 'main.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key key, this.title}) : super(key: key);
@@ -11,29 +15,64 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapState extends State<MapPage> {
-  GoogleMapController mapController;
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  final Completer<GoogleMapController> _controller = Completer();
+  final PointLatLng _start = const PointLatLng(33.748550, -84.391500);
+  final PointLatLng _end = const PointLatLng(32.391980, -86.151160);
+  Set<Polyline> _polylines = {};
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  List<LatLng> polylineCoordinates = [];
+  PolylinePoints polylinePoints = PolylinePoints();
+  String APIKey = "AIzaSyCsRS3jv8ZAOMI4vf02R5CfZH8KWmDj9Ss";
+
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(33.748550, -84.391500),
+        zoom: 1
+  );
+
+  void onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+    setPolylines();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-            "Car-Bon: Recent Trips"),
+  void setPolylines() async {
+    PolylineResult result = await
+    polylinePoints.getRouteBetweenCoordinates(
+        APIKey,
+        _start,
+        _end
+    );
+
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    }
+
+    setState(() {
+      Polyline polyline = Polyline(
+          polylineId: PolylineId("poly"),
+          color: MyColors.carbon,
+          points: polylineCoordinates
+      );
+      _polylines.add(polyline);
+    });
+  }
+
+
+
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+          appBar: AppBar(
+          title: const Text(
+          "Car-Bon: Recent Trips"),
       ),
-      body: Center(
-          child: GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _center,
-              zoom: 11.0
-            )
-          )
-        ),
+      body: GoogleMap(
+        polylines: _polylines,
+        initialCameraPosition: _kGooglePlex,
+        onMapCreated: onMapCreated
+      ),
     );
   }
 }

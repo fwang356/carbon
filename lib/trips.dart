@@ -1,6 +1,7 @@
 // @dart=2.9
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'map.dart';
 
 class TripPage extends StatefulWidget {
   const TripPage({Key key, this.title}) : super(key: key);
@@ -53,7 +54,10 @@ class _TripState extends State<TripPage> {
                               children: [
                                 ElevatedButton(
                                     onPressed: () {
-                                      // TODO: Google Maps
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const MapPage())
+                                      );
                                     },
                                     child: const Text("View Route",
                                         style: TextStyle(
@@ -96,7 +100,10 @@ class _TripState extends State<TripPage> {
                                     children: [
                                       ElevatedButton(
                                           onPressed: () {
-                                            // TODO: Google Maps
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const MapPage())
+                                            );
                                           },
                                           child: const Text("View Route",
                                               style: TextStyle(
@@ -150,7 +157,10 @@ class _TripState extends State<TripPage> {
                                     children: [
                                       ElevatedButton(
                                           onPressed: () {
-                                            // TODO: Google Maps
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const MapPage())
+                                            );
                                           },
                                           child: const Text("View Route",
                                               style: TextStyle(
