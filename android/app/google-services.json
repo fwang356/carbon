@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "967929543197",
+    "project_id": "car-bon-app",
+    "storage_bucket": "car-bon-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967929543197:android:224978bade3bd05413e4f4",
+        "android_client_info": {
+          "package_name": "com.example.carbon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "967929543197-4ooevutfi3rstg0vtf2n90hrast9p8ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7Z_sQLgs50nDsZVSG0afQArq2nU4z_yg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "967929543197-4ooevutfi3rstg0vtf2n90hrast9p8ai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
