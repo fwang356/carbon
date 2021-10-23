@@ -38,9 +38,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startBluetooth() async {
+    String status = "";
+    status = bluetooth();
     while(true) {
-      await Future.delayed(const Duration(seconds: 10));
-      bluetooth();
+      if (status == "Finished") {
+        status = "";
+        status = bluetooth();
+      }
     }
   }
 
@@ -55,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return emissions * gallons;
   }
 
-  void bluetooth() {
+  String bluetooth() {
     flutterBlue.connectedDevices.then((value) async {
       for (BluetoothDevice d in value) {
         if (d.name == carID) {
@@ -121,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     });
+    return "Finished";
   }
 /*
   void _trackLocation() async {
