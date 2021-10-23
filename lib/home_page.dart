@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 import 'help.dart';
@@ -19,7 +18,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String carID = "94:B2:CC:31:5B:55"; // TODO: Change into user's car name (carName)
+  bool _tracking = false;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   Location location = Location();
@@ -29,19 +28,6 @@ class _MyHomePageState extends State<MyHomePage> {
     const Color(0xff4d4e6d),
     const Color(0xff8f91cf),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    startBluetooth();
-  }
-
-  void startBluetooth() async {
-    while (true) {
-      await bluetooth();
-      await Future.delayed(const Duration(seconds: 20));
-    }
-  }
 
   double calculate(double distance, double mpg, String gasType) {
     double emissions;
@@ -54,113 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return emissions * gallons;
   }
 
-  Future<bool> bluetooth() async {
-    List<BluetoothDiscoveryResult> results = [];
-    var streamSubscription = FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
-      results.add(r);
-    });
-    print(results);
-
-    /*
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
-
-    // TODO: Remove print
-    var subscription = flutterBlue.scanResults.listen((results) {
-           for (ScanResult r in results) {
-             print(r.device);
-           }
-         });
-
-    flutterBlue.stopScan();
-
-     */
-
-
-
-    //List<BluetoothDevice> value = await flutterBlue.connectedDevices;
-    //for (BluetoothDevice d in value) {
-    //  print(d.id);
-      //if (d.id.toString() == carID) {
-        if (1 == 2) {
-        _serviceEnabled = await location.serviceEnabled();
-        if (!_serviceEnabled) {
-          _serviceEnabled = await location.requestService();
-          if (!_serviceEnabled) {
-            return false;
-          }
-        }
-
-        _permissionGranted = await location.hasPermission();
-        if (_permissionGranted == PermissionStatus.denied) {
-          _permissionGranted = await location.requestPermission();
-          if (_permissionGranted != PermissionStatus.granted) {
-            return false;
-          }
-        }
-
-        print("Connected");
-        bool connected = true;
-
-        Drive drive = Drive();
-        drive.date = DateTime.now();
-
-        LocationData start = await location.getLocation();
-        double lat1 = start.latitude;
-        double lon1 = start.longitude;
-        while (connected) {
-          connected = false;
-          print("Still connected");
-          /*
-          await flutterBlue.connectedDevices.then((list) async {
-            for (BluetoothDevice device in list) {
-              if (device.id.toString() == carID) {
-                connected = true;
-              }
-            }
-
-           */
-          if (connected) {
-            drive.waypoints.add({
-              "lat": lat1,
-              "lon": lon1,
-            });
-            await Future.delayed(const Duration(seconds: 5));
-            LocationData curr = await location.getLocation();
-            double lat2 = curr.latitude;
-            double lon2 = curr.longitude;
-            drive.distance += _getDistance(lat1, lon1, lat2, lon2);
-            lat1 = lat2;
-            lon1 = lon2;
-          }
-          //});
-        }
-
-
-        }
-        print("Disconnected");
-
-        /*
-        if (drive.waypoints.isNotEmpty) {
-          FirebaseFirestore firestore = FirebaseFirestore.instance;
-          FirebaseAuth auth = FirebaseAuth.instance;
-
-          firestore
-              .collection("users")
-              .doc(auth.currentUser.uid)
-              .collection("drives")
-              .doc()
-              .set(drive.map());
-        }
-
-         */
-     // }
-   // }
-    return true;
-  }
-
-
-
-/*
   void _trackLocation() async {
     Drive drive = Drive();
     drive.date = DateTime.now();
@@ -181,18 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
     }
-
-    flutterBlue.startScan(timeout: const Duration(seconds: 4));
-
-    // Listen to scan results
-    var subscription = flutterBlue.scanResults.listen((results) {
-      for (ScanResult r in results) {
-        // print(r.device);
-      }
-    });
-
-    // Stop scanning
-    flutterBlue.stopScan();
 
     _tracking = !_tracking;
     if (_tracking) {
@@ -231,8 +98,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
- */
-
 
   double _getDistance(double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
@@ -265,9 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Center(
           child: SingleChildScrollView(
               child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              /*
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(top: 1, bottom: 24),
                     child: ElevatedButton(
@@ -282,194 +146,192 @@ class _MyHomePageState extends State<MyHomePage> {
                         minimumSize: const Size(120, 50),
                       ))),
 
-                   */
-
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: SizedBox(
-                    width: 350,
-                    height: 200,
-                    child: LineChart(
-                      LineChartData(
-                        backgroundColor:
-                            const Color(0xfffffffa).withOpacity(0.1),
-                        gridData: FlGridData(
-                          show: true,
-                          drawVerticalLine: true,
-                          getDrawingHorizontalLine: (value) {
-                            return FlLine(
-                              color: const Color(0xff4d4e6d),
-                              strokeWidth: 1,
-                            );
-                          },
-                          getDrawingVerticalLine: (value) {
-                            return FlLine(
-                              color: const Color(0xff4d4e6d),
-                              strokeWidth: 1,
-                            );
-                          },
-                        ),
-                        titlesData: FlTitlesData(
-                          show: true,
-                          rightTitles: SideTitles(showTitles: false),
-                          topTitles: SideTitles(showTitles: false),
-                          bottomTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 22,
-                            interval: 1,
-                            getTextStyles: (context, value) => const TextStyle(
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: SizedBox(
+                      width: 350,
+                      height: 200,
+                      child: LineChart(
+                        LineChartData(
+                          backgroundColor:
+                              const Color(0xfffffffa).withOpacity(0.1),
+                          gridData: FlGridData(
+                            show: true,
+                            drawVerticalLine: true,
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                color: const Color(0xff4d4e6d),
+                                strokeWidth: 1,
+                              );
+                            },
+                            getDrawingVerticalLine: (value) {
+                              return FlLine(
+                                color: const Color(0xff4d4e6d),
+                                strokeWidth: 1,
+                              );
+                            },
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            rightTitles: SideTitles(showTitles: false),
+                            topTitles: SideTitles(showTitles: false),
+                            bottomTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 22,
+                              interval: 1,
+                              getTextStyles: (context, value) => const TextStyle(
+                                  color: Color(0xff4d4e6d),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                              getTitles: (value) {
+                                switch (value.toInt()) {
+                                  case 2:
+                                    return 'MAR';
+                                  case 5:
+                                    return 'JUN';
+                                  case 8:
+                                    return 'SEP';
+                                }
+                                return '';
+                              },
+                              margin: 8,
+                            ),
+                            leftTitles: SideTitles(
+                              showTitles: true,
+                              interval: 1,
+                              getTextStyles: (context, value) => const TextStyle(
                                 color: Color(0xff4d4e6d),
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                            getTitles: (value) {
-                              switch (value.toInt()) {
-                                case 2:
-                                  return 'MAR';
-                                case 5:
-                                  return 'JUN';
-                                case 8:
-                                  return 'SEP';
-                              }
-                              return '';
-                            },
-                            margin: 8,
-                          ),
-                          leftTitles: SideTitles(
-                            showTitles: true,
-                            interval: 1,
-                            getTextStyles: (context, value) => const TextStyle(
-                              color: Color(0xff4d4e6d),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                                fontSize: 15,
+                              ),
+                              getTitles: (value) {
+                                switch (value.toInt()) {
+                                  case 1:
+                                    return '10k';
+                                  case 3:
+                                    return '30k';
+                                  case 5:
+                                    return '50k';
+                                }
+                                return '';
+                              },
+                              reservedSize: 32,
+                              margin: 12,
                             ),
-                            getTitles: (value) {
-                              switch (value.toInt()) {
-                                case 1:
-                                  return '10k';
-                                case 3:
-                                  return '30k';
-                                case 5:
-                                  return '50k';
-                              }
-                              return '';
-                            },
-                            reservedSize: 32,
-                            margin: 12,
                           ),
-                        ),
-                        borderData: FlBorderData(
-                            show: true,
-                            border: Border.all(
-                                color: const Color(0xff4d4e6d), width: 1)),
-                        minX: 0,
-                        maxX: 11,
-                        minY: 0,
-                        maxY: 6,
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: const [
-                              FlSpot(0, 3),
-                              FlSpot(2.6, 2),
-                              FlSpot(4.9, 5),
-                              FlSpot(6.8, 3.1),
-                              FlSpot(8, 4),
-                              FlSpot(9.5, 3),
-                              FlSpot(11, 4),
-                            ],
-                            isCurved: true,
-                            colors: gradientColors,
-                            barWidth: 5,
-                            isStrokeCapRound: true,
-                            dotData: FlDotData(
-                              show: false,
-                            ),
-                            belowBarData: BarAreaData(
+                          borderData: FlBorderData(
                               show: true,
-                              colors: gradientColors
-                                  .map((color) => color.withOpacity(0.3))
-                                  .toList(),
+                              border: Border.all(
+                                  color: const Color(0xff4d4e6d), width: 1)),
+                          minX: 0,
+                          maxX: 11,
+                          minY: 0,
+                          maxY: 6,
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: const [
+                                FlSpot(0, 3),
+                                FlSpot(2.6, 2),
+                                FlSpot(4.9, 5),
+                                FlSpot(6.8, 3.1),
+                                FlSpot(8, 4),
+                                FlSpot(9.5, 3),
+                                FlSpot(11, 4),
+                              ],
+                              isCurved: true,
+                              colors: gradientColors,
+                              barWidth: 5,
+                              isStrokeCapRound: true,
+                              dotData: FlDotData(
+                                show: false,
+                              ),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                colors: gradientColors
+                                    .map((color) => color.withOpacity(0.3))
+                                    .toList(),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
+                          ],
+                        ),
+                      )),
+                ),
 
-              const Text(
-                  "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
-                  style: TextStyle(
-                      fontSize: 20,
-                      height:
-                          1.5)), // TODO: Change distance to past week carbon emissions
+                const Text(
+                    "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
+                    style: TextStyle(
+                        fontSize: 20,
+                        height:
+                            1.5)), // TODO: Change distance to past week carbon emissions
 
-              Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const TripPage()));
-                              }, // Open new page
-                              child: const Text("Recent Trips",
-                                  style: TextStyle(fontSize: 16)),
-                              style: ElevatedButton.styleFrom(
-                                primary: const Color(0xFF7badab),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(40)),
-                                minimumSize: const Size(80, 40),
-                              ))))),
+                Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 8),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const TripPage()));
+                                }, // Open new page
+                                child: const Text("Recent Trips",
+                                    style: TextStyle(fontSize: 16)),
+                                style: ElevatedButton.styleFrom(
+                                  primary: const Color(0xFF7badab),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40)),
+                                  minimumSize: const Size(80, 40),
+                                ))))),
 
-              SizedBox(
-                  height: 200,
-                  width: 360,
-                  child: Card(
-                      elevation: 24,
-                      color: const Color(0xFFFFFFFF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: ListView(children: <Widget>[
-                        const Padding(
-                            padding: EdgeInsets.only(
-                                top: 20, right: 20, left: 20, bottom: 12),
-                            child: Text("Save Our Environment",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700))),
-                        const Padding(
-                            padding: EdgeInsets.only(left: 20, right: 20),
-                            child: Text(
-                                //"The average person emits about 88.46 kg of carbon dioxide per week from driving.",
-                                'According to the UN, carbon emissions must be reduced by 7.6% per year for the next decade to prevent climate change.',
-                                style: TextStyle(fontSize: 14),
-                                textAlign: TextAlign.left)),
-                        ButtonBar(children: [
-                          Padding(
-                              padding: const EdgeInsets.only(right: 20),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const HelpPage()));
-                                  },
-                                  child: const Text("How to Help",
-                                      style: TextStyle(fontSize: 14)),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: const Color(0xFF7badab),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(40)),
-                                    minimumSize: const Size(80, 40),
-                                  )))
-                        ])
+                SizedBox(
+                    height: 200,
+                    width: 360,
+                    child: Card(
+                        elevation: 24,
+                        color: const Color(0xFFFFFFFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        child: ListView(children: <Widget>[
+                          const Padding(
+                              padding: EdgeInsets.only(
+                                  top: 20, right: 20, left: 20, bottom: 12),
+                              child: Text("Save Our Environment",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700))),
+                          const Padding(
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: Text(
+                                  //"The average person emits about 88.46 kg of carbon dioxide per week from driving.",
+                                  'According to the UN, carbon emissions must be reduced by 7.6% per year for the next decade to prevent climate change.',
+                                  style: TextStyle(fontSize: 14),
+                                  textAlign: TextAlign.left)),
+                          ButtonBar(children: [
+                            Padding(
+                                padding: const EdgeInsets.only(right: 20),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HelpPage()));
+                                    },
+                                    child: const Text("How to Help",
+                                        style: TextStyle(fontSize: 14)),
+                                    style: ElevatedButton.styleFrom(
+                                      primary: const Color(0xFF7badab),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(40)),
+                                      minimumSize: const Size(80, 40),
+                                    )))
+                          ])
                       ])))
             ],
           )),
