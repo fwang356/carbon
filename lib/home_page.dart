@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:math';
 import 'help.dart';
@@ -19,7 +19,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  FlutterBlue flutterBlue = FlutterBlue.instance;
   String carID = "94:B2:CC:31:5B:55"; // TODO: Change into user's car name (carName)
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
@@ -56,7 +55,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<bool> bluetooth() async {
+    List<BluetoothDiscoveryResult> results = [];
+    var streamSubscription = FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
+      results.add(r);
+    });
+    print(results);
 
+    /*
     flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
     // TODO: Remove print
@@ -68,10 +73,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
     flutterBlue.stopScan();
 
-    List<BluetoothDevice> value = await flutterBlue.connectedDevices;
-    for (BluetoothDevice d in value) {
-      print(d.id);
-      if (d.id.toString() == carID) {
+     */
+
+
+
+    //List<BluetoothDevice> value = await flutterBlue.connectedDevices;
+    //for (BluetoothDevice d in value) {
+    //  print(d.id);
+      //if (d.id.toString() == carID) {
+        if (1 == 2) {
         _serviceEnabled = await location.serviceEnabled();
         if (!_serviceEnabled) {
           _serviceEnabled = await location.requestService();
@@ -100,29 +110,36 @@ class _MyHomePageState extends State<MyHomePage> {
         while (connected) {
           connected = false;
           print("Still connected");
+          /*
           await flutterBlue.connectedDevices.then((list) async {
             for (BluetoothDevice device in list) {
               if (device.id.toString() == carID) {
                 connected = true;
               }
             }
-            if (connected) {
-              drive.waypoints.add({
-                "lat": lat1,
-                "lon": lon1,
-              });
-              await Future.delayed(const Duration(seconds: 5));
-              LocationData curr = await location.getLocation();
-              double lat2 = curr.latitude;
-              double lon2 = curr.longitude;
-              drive.distance += _getDistance(lat1, lon1, lat2, lon2);
-              lat1 = lat2;
-              lon1 = lon2;
-            }
-          });
+
+           */
+          if (connected) {
+            drive.waypoints.add({
+              "lat": lat1,
+              "lon": lon1,
+            });
+            await Future.delayed(const Duration(seconds: 5));
+            LocationData curr = await location.getLocation();
+            double lat2 = curr.latitude;
+            double lon2 = curr.longitude;
+            drive.distance += _getDistance(lat1, lon1, lat2, lon2);
+            lat1 = lat2;
+            lon1 = lon2;
+          }
+          //});
+        }
+
+
         }
         print("Disconnected");
 
+        /*
         if (drive.waypoints.isNotEmpty) {
           FirebaseFirestore firestore = FirebaseFirestore.instance;
           FirebaseAuth auth = FirebaseAuth.instance;
@@ -134,10 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
               .doc()
               .set(drive.map());
         }
-      }
-    }
+
+         */
+     // }
+   // }
     return true;
   }
+
+
 
 /*
   void _trackLocation() async {
@@ -209,7 +230,9 @@ class _MyHomePageState extends State<MyHomePage> {
           .doc().set(drive.map());
     }
   }
-  */
+
+ */
+
 
   double _getDistance(double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
