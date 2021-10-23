@@ -18,12 +18,9 @@ class _MapState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
   final PointLatLng _start = const PointLatLng(33.748550, -84.391500);
   final PointLatLng _end = const PointLatLng(32.391980, -86.151160);
-  final PointLatLng _end2 = const PointLatLng(33.518589, -86.810356);
-  final PointLatLng _start2 = const PointLatLng(32.376541, -86.299660);
   Set<Polyline> _polylines = {};
 
   List<LatLng> polylineCoordinates = [];
-  List<LatLng> polylineCoordinates2 = [];
   PolylinePoints polylinePoints = PolylinePoints();
   String APIKey = "AIzaSyCsRS3jv8ZAOMI4vf02R5CfZH8KWmDj9Ss";
 
@@ -51,19 +48,6 @@ class _MapState extends State<MapPage> {
       }
     }
 
-    PolylineResult result2 = await
-    polylinePoints.getRouteBetweenCoordinates(
-        APIKey,
-        _start2,
-        _end2
-    );
-
-    if (result2.points.isNotEmpty) {
-      for (var point in result2.points) {
-        polylineCoordinates2.add(LatLng(point.latitude, point.longitude));
-      }
-    }
-
     setState(() {
       Polyline polyline = Polyline(
           polylineId: const PolylineId("poly"),
@@ -71,14 +55,7 @@ class _MapState extends State<MapPage> {
           points: polylineCoordinates
       );
 
-
-      Polyline polyline2 = Polyline(
-        polylineId: const PolylineId("poly"),
-        color: const Color(0xFF7badab),
-        points: polylineCoordinates2
-      );
       _polylines.add(polyline);
-      _polylines.add(polyline2);
     });
   }
 
