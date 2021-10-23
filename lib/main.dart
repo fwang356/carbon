@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'auth.dart';
 import "loading.dart";
+import "map.dart";
 
 void main() => runApp(const MyApp());
 
