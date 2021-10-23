@@ -20,12 +20,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   FlutterBlue flutterBlue = FlutterBlue.instance;
-  String carID = "Forerunner 35";
+  String carID = "Forerunner 35"; // TODO: Change into user's car name (carName)
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
-  LocationData _locationData;
   Location location = Location();
-  bool _tracking = false;
   String message = "Start Tracking!";
 
   List<Color> gradientColors = [
@@ -36,9 +34,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // while(true) {
+    startBluetooth();
+  }
+
+  void startBluetooth() async {
+    while(true) {
+      await Future.delayed(const Duration(seconds: 10));
       bluetooth();
-    // }
+    }
   }
 
   double calculate(double distance, double mpg, String gasType) {
@@ -102,10 +105,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 drive.distance += _getDistance(lat1, lon1, lat2, lon2);
                 lat1 = lat2;
                 lon1 = lon2;
-                }
-              });
-            }
-            print("Disconnected");
+              }
+            });
+          }
+          print("Disconnected");
 
           if (drive.waypoints.isNotEmpty) {
             FirebaseFirestore firestore = FirebaseFirestore.instance;
