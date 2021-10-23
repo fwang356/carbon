@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Location location = Location();
   bool _tracking = false;
   String message = "Start Tracking!";
-  List<List<double>> waypoints;
+  List<List<double>> waypoints = [];
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -102,21 +102,17 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    /*
-    // Start scanning
     flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
     // Listen to scan results
     var subscription = flutterBlue.scanResults.listen((results) {
       for (ScanResult r in results) {
-        print(r.device.state);
+        print(r.device);
       }
     });
 
      // Stop scanning
     flutterBlue.stopScan();
-     */
-
 
     _tracking = !_tracking;
     if (_tracking) {
@@ -134,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double lon1 = start.longitude;
     while (_tracking) {
       waypoints.add([lat1, lon1]);
-      await Future.delayed(const Duration(seconds: 10));
+      await Future.delayed(const Duration(seconds: 5));
       LocationData curr = await location.getLocation();
       double lat2 = curr.latitude;
       double lon2 = curr.longitude;
