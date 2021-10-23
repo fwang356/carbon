@@ -33,6 +33,14 @@ class _MyHomePageState extends State<MyHomePage> {
     const Color(0xff8f91cf),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // while(true) {
+      bluetooth();
+    // }
+  }
+
   double calculate(double distance, double mpg, String gasType) {
     double emissions;
     if (gasType == "Gasoline") {
@@ -75,7 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
           double lon1 = start.longitude;
           while (connected) {
             connected = false;
-            flutterBlue.connectedDevices.then((list) async {
+            print("Still connected");
+            await flutterBlue.connectedDevices.then((list) async {
               for (BluetoothDevice device in list) {
                 if (device.name == carID) {
                   connected = true;
@@ -95,7 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 lon1 = lon2;
                 }
               });
-          }
+            }
+            print("Disconnected");
 
           if (drive.waypoints.isNotEmpty) {
             FirebaseFirestore firestore = FirebaseFirestore.instance;
