@@ -44,27 +44,57 @@ class _MyHomePageState extends State<MyHomePage> {
     return emissions * gallons;
   }
 
-  double bluetooth() {
-    flutterBlue.connectedDevices.then((value) {
+  void bluetooth() {
+    flutterBlue.connectedDevices.then((value) async {
       for (BluetoothDevice d in value) {
         if (d.name == carID) {
-          BluetoothDevice car = d;
+          _serviceEnabled = await location.serviceEnabled();
+          if (!_serviceEnabled) {
+            _serviceEnabled = await location.requestService();
+            if (!_serviceEnabled) {
+              return;
+            }
+          }
+
+          _permissionGranted = await location.hasPermission();
+          if (_permissionGranted == PermissionStatus.denied) {
+            _permissionGranted = await location.requestPermission();
+            if (_permissionGranted != PermissionStatus.granted) {
+              return;
+            }
+          }
+
+          print("Connected");
           bool connected = true;
+
           Drive drive = Drive();
           drive.date = DateTime.now();
+
+          LocationData start = await location.getLocation();
+          double lat1 = start.latitude;
+          double lon1 = start.longitude;
           while (connected) {
             connected = false;
-            flutterBlue.connectedDevices.then((list) {
+            flutterBlue.connectedDevices.then((list) async {
               for (BluetoothDevice device in list) {
                 if (device.name == carID) {
                   connected = true;
-                  print("Connected");
                 }
               }
               if (connected) {
-                _trackLocation();
-              }
-            });
+                drive.waypoints.add({
+                  "lat": lat1,
+                  "lon": lon1,
+                });
+                await Future.delayed(const Duration(seconds: 5));
+                LocationData curr = await location.getLocation();
+                double lat2 = curr.latitude;
+                double lon2 = curr.longitude;
+                drive.distance += _getDistance(lat1, lon1, lat2, lon2);
+                lat1 = lat2;
+                lon1 = lon2;
+                }
+              });
           }
 
           if (drive.waypoints.isNotEmpty) {
@@ -79,8 +109,11 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
-
+/*
   void _trackLocation() async {
+    Drive drive = Drive();
+    drive.date = DateTime.now();
+
     // TODO: Move initialization code
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
@@ -136,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
       lat1 = lat2;
       lon1 = lon2;
     }
-/*
+
     if(drive.waypoints.isNotEmpty) {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -144,8 +177,9 @@ class _MyHomePageState extends State<MyHomePage> {
       firestore.collection("users").doc(auth.currentUser.uid).collection(
           "drives")
           .doc().set(drive.map());
-    }*/
+    }
   }
+  */
 
   double _getDistance (double lat1, double lon1, double lat2, double lon2) {
     var p = 0.017453292519943295;
@@ -180,6 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  /*
                   Padding(
                     padding: const EdgeInsets.only(top: 1, bottom: 24),
                     child: ElevatedButton(
@@ -194,7 +229,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         minimumSize: const Size(120, 50),
                       ))),
 
-              // TODO: Line graph of past week emissions
+                   */
+
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: SizedBox(
