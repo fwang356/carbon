@@ -40,11 +40,11 @@ class _SignupState extends State<SignupPage> {
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextField(
-                            controller: emailController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: "Email",
-                            )
+                              controller: emailController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: "Email",
+                              )
                           )
                       ),
 
@@ -105,6 +105,11 @@ class _SignupState extends State<SignupPage> {
                           onPressed: () {
                             // TODO: Sign Up
                             auth.createUserWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => MyHomePage()),
+                                  (Route<dynamic> route) => false,
+                            );
                           },
                           child: const Text("Sign Up",
                               style: TextStyle(

@@ -156,36 +156,36 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Car-Bon: Track Your Carbon Emission!")),
-      body: Center(
+        appBar: AppBar(title: const Text("Car-Bon: Track Your Carbon Emission!")),
+        body: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.only(top: 1, bottom: 24),
-                    child: ElevatedButton(
-                        onPressed: _trackLocation,
-                        child: Text(message,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xFFFFFFFF)
-                                    )),
-                        style: ElevatedButton.styleFrom(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                      padding: const EdgeInsets.only(top: 1, bottom: 24),
+                      child: ElevatedButton(
+                          onPressed: _trackLocation,
+                          child: Text(message,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFFFFFFFF)
+                              )),
+                          style: ElevatedButton.styleFrom(
                             primary: const Color(0xFF7badab),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40)),
-                          minimumSize: const Size(120, 50),
-                    ))
-                ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40)),
+                            minimumSize: const Size(120, 50),
+                          ))
+                  ),
 
-                // TODO: Line graph of past week emissions
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: SizedBox(
-                      width: 350,
-                      height: 200,
-                      child: LineChart(
+                  // TODO: Line graph of past week emissions
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: SizedBox(
+                        width: 350,
+                        height: 200,
+                        child: LineChart(
                           LineChartData(
                             backgroundColor: const Color(0xfffffffa).withOpacity(0.1),
                             gridData: FlGridData(
@@ -285,113 +285,113 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ],
                           ),
-                    )
-                  ),
-                ),
-
-                Text(
-                    "Past Week's Carbon Emissions: $distance",
-                    style: const TextStyle(
-                        fontSize: 20,
-                        height: 1.5)), // TODO: Change distance to past week carbon emissions
-
-                Padding(
-                    padding: const EdgeInsets.only(top: 16, bottom: 8),
-                    child: Align(
-                     alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const TripPage())
-                              );
-                            }, // Open new page
-                            child: const Text("Recent Trips",
-                                style: TextStyle(
-                                    fontSize: 16
-                                )),
-                            style: ElevatedButton.styleFrom(
-                              primary: const Color(0xFF7badab),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(40)),
-                              minimumSize: const Size(80, 40),
-                            ))
-                      )
-                    )
-                ),
-
-                SizedBox(
-                  height: 200,
-                  width: 360,
-                  child: Card(
-                    elevation: 24,
-                    color: const Color(0xFFFFFFFF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                        )
                     ),
-                    child: ListView(
-                        children: <Widget>[
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 12),
-                            child: Text(
-                              "Save Our Environment",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700
-                              )
-                            )
-                          ),
+                  ),
 
-                          const Padding(
-                            padding: EdgeInsets.only(left: 20, right: 20),
-                            child: Text(
-                              //"The average person emits about 88.46 kg of carbon dioxide per week from driving.",
-                                'According to the UN, carbon emissions must be reduced by 7.6% per year for the next decade to prevent climate change.',
-                                style: TextStyle(
-                                    fontSize: 14),
-                                textAlign: TextAlign.left)
-                          ),
+                  Text(
+                      "Past Week's Carbon Emissions: $distance",
+                      style: const TextStyle(
+                          fontSize: 20,
+                          height: 1.5)), // TODO: Change distance to past week carbon emissions
 
-                          ButtonBar(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 20),
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => const HelpPage())
-                                      );
-                                    },
-                                    child: const Text("How to Help",
-                                        style: TextStyle(
-                                            fontSize: 14
-                                        )),
-                                    style: ElevatedButton.styleFrom(
-                                      primary: const Color(0xFF7badab),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(40)),
-                                      minimumSize: const Size(80, 40),
-                                    ))
-                              )
-                            ]
+                  Padding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 8),
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const TripPage())
+                                    );
+                                  }, // Open new page
+                                  child: const Text("Recent Trips",
+                                      style: TextStyle(
+                                          fontSize: 16
+                                      )),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: const Color(0xFF7badab),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(40)),
+                                    minimumSize: const Size(80, 40),
+                                  ))
                           )
-                        ]
-                    )
+                      )
+                  ),
 
-                )
-                )
-              ],
-            )),
-          )
+                  SizedBox(
+                      height: 200,
+                      width: 360,
+                      child: Card(
+                          elevation: 24,
+                          color: const Color(0xFFFFFFFF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          child: ListView(
+                              children: <Widget>[
+                                const Padding(
+                                    padding: EdgeInsets.only(top: 20, right: 20, left: 20, bottom: 12),
+                                    child: Text(
+                                        "Save Our Environment",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700
+                                        )
+                                    )
+                                ),
+
+                                const Padding(
+                                    padding: EdgeInsets.only(left: 20, right: 20),
+                                    child: Text(
+                                      //"The average person emits about 88.46 kg of carbon dioxide per week from driving.",
+                                        'According to the UN, carbon emissions must be reduced by 7.6% per year for the next decade to prevent climate change.',
+                                        style: TextStyle(
+                                            fontSize: 14),
+                                        textAlign: TextAlign.left)
+                                ),
+
+                                ButtonBar(
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.only(right: 20),
+                                          child: ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => const HelpPage())
+                                                );
+                                              },
+                                              child: const Text("How to Help",
+                                                  style: TextStyle(
+                                                      fontSize: 14
+                                                  )),
+                                              style: ElevatedButton.styleFrom(
+                                                primary: const Color(0xFF7badab),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(40)),
+                                                minimumSize: const Size(80, 40),
+                                              ))
+                                      )
+                                    ]
+                                )
+                              ]
+                          )
+
+                      )
+                  )
+                ],
+              )),
+        )
 
     );
   }
 }
 
-/* Citations:
+/* TODO: Citations:
 https://www.un.org/en/climatechange/science/key-findings
 https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle
 https://www.epa.gov/transportation-air-pollution-and-climate-change/what-you-can-do-reduce-pollution-vehicles-and
