@@ -74,7 +74,7 @@ class _MapState extends State<MapPage> {
       return Scaffold(
           appBar: AppBar(
           title: const Text(
-          "Car-Bon: Recent Trips"),
+          "Recent Trips"),
       ),
       body: GoogleMap(
         polylines: _polylines,

@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void query() async {
     today = DateTime.now();
-    DateTime weekAgo = DateTime(today.year, today.month, today.day - 8);
+    DateTime weekAgo = DateTime(today.year, today.month, today.day - 7);
     for (int i = 0; i < 7; i++) {
       dates.add(DateFormat("MM/dd").format(
           DateTime(today.year, today.month, today.day - i)));
@@ -71,6 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < 7; i++) {
       points.add(FlSpot((i * 2).toDouble(), emissions[i]));
     }
+
+    setState(() {});
   }
 
 
@@ -121,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     } else {
       setState(() {
-        message = "Start Tracking!";
+        message = "Start Tracking";
       });
     }
     LocationData start = await location.getLocation();
@@ -166,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
         appBar: AppBar(
-            title: const Text("Overview"),
+            title: const Text("Dashboard"),
             actions: [
               ElevatedButton(
                   onPressed: () {
