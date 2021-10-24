@@ -24,7 +24,7 @@ class _TripState extends State<TripPage> {
     Future<QuerySnapshot<Map<String, dynamic>>> trips = firestore
         .collection("users")
         .doc(auth.currentUser.uid)
-        .collection("drives")
+        .collection("drives").orderBy('date', descending: true)
         .where(
         'date', isGreaterThan: weekAgo)
         .get();
@@ -101,7 +101,7 @@ class _TripState extends State<TripPage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(left: 40),
+                    padding: const EdgeInsets.only(left: 25),
                     child: ButtonBar(
                         alignment: MainAxisAlignment.end,
                         children: [
@@ -120,7 +120,7 @@ class _TripState extends State<TripPage> {
                                 primary: const Color(0xFF7badab),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(40)),
-                                minimumSize: const Size(60, 40),
+                                minimumSize: const Size(40, 35),
                               )
                           )
                         ]
