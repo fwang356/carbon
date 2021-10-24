@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       emissions = 10.18;
     }
-    double gallons = distance / mpg;
+    double gallons = distance / (1.60834 * mpg);
     return emissions * gallons;
   }
 
