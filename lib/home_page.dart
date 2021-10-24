@@ -23,11 +23,36 @@ class _MyHomePageState extends State<MyHomePage> {
   PermissionStatus _permissionGranted;
   Location location = Location();
   String message = "Start Tracking!";
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
+  double weeklySum = 0;
+  List<double> emissions = [];
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
     const Color(0xff8f91cf),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    DateTime today = DateTime.now();
+    DateTime weekAgo = DateTime(today.year, today.month, today.day - 8);
+
+    firestore.collection("users").doc(auth.currentUser.uid).collection("drives").where(
+        'date', isGreaterThan: weekAgo)
+        .get()
+        .then((
+        QuerySnapshot querySnapshot) {
+          querySnapshot.docs.forEach((doc) {
+            double data = (doc.data() as Map)["emissions"];
+            weeklySum += data;
+            emissions.add(data);
+          });
+    });
+
+
+  }
 
   double calculate(double distance, double mpg, String gasType) {
     double emissions;
@@ -38,6 +63,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     double gallons = distance / mpg;
     return emissions * gallons;
+  }
+
+  double _getDistance(double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
   }
 
   void _trackLocation() async {
@@ -88,24 +122,23 @@ class _MyHomePageState extends State<MyHomePage> {
       lon1 = lon2;
     }
 
-    if(drive.waypoints.isNotEmpty) {
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-      FirebaseAuth auth = FirebaseAuth.instance;
+    if(drive.waypoints.length < 10) {
+      double mpg = 0;
+      String fuelType;
+
+      firestore.collection("users").doc(auth.currentUser.uid).get().then((
+          DocumentSnapshot documentSnapshot) {
+        Map data = documentSnapshot.data() as Map;
+        fuelType = data["fuelType"];
+        mpg = data["mpg"];
+      });
+
+      drive.emissions = calculate(drive.distance, mpg, fuelType);
 
       firestore.collection("users").doc(auth.currentUser.uid).collection(
           "drives")
           .doc().set(drive.map());
     }
-  }
-
-
-  double _getDistance(double lat1, double lon1, double lat2, double lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a));
   }
 
   @override
