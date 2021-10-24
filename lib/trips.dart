@@ -16,27 +16,6 @@ class TripPage extends StatefulWidget {
 }
 
 class _TripState extends State<TripPage> {
-  List<Map<dynamic, dynamic>> trips = [];
-
-  @override
-  void initState() {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    FirebaseAuth auth = FirebaseAuth.instance;
-
-    firestore.collection("users").doc(auth.currentUser.uid).collection("drives").orderBy(
-        'date', descending: true
-    ).get()
-        .then((
-        QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        if (trips.length < 11) {
-          trips.add(doc.data() as Map);
-          }
-        });
-      }
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     FirebaseAuth auth = FirebaseAuth.instance;
