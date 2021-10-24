@@ -143,11 +143,11 @@ class _MyHomePageState extends State<MyHomePage> {
       lon1 = lon2;
     }
 
-    if(drive.waypoints.length > 10 || drive.distance > 0.5) {
+    if(drive.waypoints.length > 10 && drive.distance > 0) {
       double mpg = 0;
       String fuelType;
 
-      firestore.collection("users").doc(auth.currentUser.uid).get().then((
+      await firestore.collection("users").doc(auth.currentUser.uid).get().then((
           DocumentSnapshot documentSnapshot) {
         Map data = documentSnapshot.data() as Map;
         fuelType = data["fuelType"];
@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       drive.emissions = calculate(drive.distance, mpg, fuelType);
 
-      firestore.collection("users").doc(auth.currentUser.uid).collection(
+      await firestore.collection("users").doc(auth.currentUser.uid).collection(
           "drives")
           .doc().set(drive.map());
     }
