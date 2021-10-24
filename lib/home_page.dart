@@ -185,19 +185,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 1, bottom: 24),
-                    child: ElevatedButton(
-                      onPressed: _trackLocation,
-                      child: Text(message,
-                          style: const TextStyle(
-                              fontSize: 16, color: Color(0xFFFFFFFF))),
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF7badab),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40)),
-                        minimumSize: const Size(120, 50),
-                      ))),
-
+                      padding: const EdgeInsets.only(top: 20, bottom: 20),
+                      child: ElevatedButton(
+                          onPressed: _trackLocation,
+                          child: Text(message,
+                              style: const TextStyle(
+                                  fontSize: 16, color: Color(0xFFFFFFFF))),
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color(0xFF7badab),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40)),
+                            minimumSize: const Size(120, 50),
+                          ))),
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                   child: Card(
@@ -340,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
 
                         const Padding(
-                          padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                          padding: EdgeInsets.only(left: 20, right: 20, bottom: 4),
                           child: Text(
                               "The average person emits about 88.46 kg of carbon dioxide per week from driving.",
                               style: TextStyle(
@@ -348,37 +347,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                   height: 1),
                                   textAlign: TextAlign.center),
                         ),
+
+                        Padding(
+                            padding: const EdgeInsets.only(top: 8, bottom: 12),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                  const TripPage()));
+                                        }, // Open new page
+                                        child: const Text("Recent Trips",
+                                            style: TextStyle(fontSize: 16)),
+                                        style: ElevatedButton.styleFrom(
+                                          primary: const Color(0xFF7badab),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(40)),
+                                          minimumSize: const Size(80, 40),
+                                        ))))),
+
                       ]
                     )
-
-
                   )
-
                 ),
-
-
-                Padding(
-                    padding: const EdgeInsets.only(top: 16, bottom: 8),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const TripPage()));
-                                }, // Open new page
-                                child: const Text("Recent Trips",
-                                    style: TextStyle(fontSize: 16)),
-                                style: ElevatedButton.styleFrom(
-                                  primary: const Color(0xFF7badab),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(40)),
-                                  minimumSize: const Size(80, 40),
-                                ))))),
 
                 SizedBox(
                     height: 200,
