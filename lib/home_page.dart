@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
       lon1 = lon2;
     }
 
-    if(drive.waypoints.length < 10) {
+    if(drive.waypoints.length > 10 || drive.distance > 0.5) {
       double mpg = 0;
       String fuelType;
 
