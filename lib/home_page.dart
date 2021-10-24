@@ -46,11 +46,11 @@ class _MyHomePageState extends State<MyHomePage> {
         .get()
         .then((
         QuerySnapshot querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
+          for (var doc in querySnapshot.docs) {
             double data = (doc.data() as Map)["emissions"];
             weeklySum += data;
             emissions.add(data);
-          });
+          }
     });
 
 

@@ -87,9 +87,9 @@ class _AuthState extends State<AuthPage> {
                       ),
 
                       ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             // TODO: Handle Login error (e.g. incorrect password)
-                            auth.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
+                            await auth.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(builder: (context) => MyHomePage()),

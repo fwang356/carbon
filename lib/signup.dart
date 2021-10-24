@@ -110,7 +110,7 @@ class _SignupState extends State<SignupPage> {
                             // TODO: Handle Signup errors (e.g. password too short, )
                             double mpg = double.parse(mpgController.text);
 
-                            Utilities.createAndLoginUser(emailController.text, passwordController.text, mpg, _selectedFuel);
+                            await Utilities.createAndLoginUser(emailController.text, passwordController.text, mpg, _selectedFuel);
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

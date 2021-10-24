@@ -1,11 +1,8 @@
 // @dart=2.9
-import 'package:carbon/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'home_page.dart';
+import 'package:intl/intl.dart';
 import 'map.dart';
 
 class TripPage extends StatefulWidget {
@@ -21,10 +18,15 @@ class _TripState extends State<TripPage> {
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+    DateTime today = DateTime.now();
+    DateTime weekAgo = DateTime(today.year, today.month, today.day - 8);
+
     Future<QuerySnapshot<Map<String, dynamic>>> trips = firestore
         .collection("users")
         .doc(auth.currentUser.uid)
         .collection("drives")
+        .where(
+        'date', isGreaterThan: weekAgo)
         .get();
 
     return Scaffold(
@@ -36,67 +38,41 @@ class _TripState extends State<TripPage> {
         child: FutureBuilder(
             future: trips,
             builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-              List<Padding> trips = [];
+              List<Padding> listItems = [];
 
               if(snapshot.hasData) {
+                DateTime activeDate;
+
                 for(QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.data.docs) {
-                  double distance = (doc.get("distance") * 1000).round() / 1000.0;
+                  double distance = doc.get("distance");
+
                   // TODO: emissions and waypoints
                   // double emissions = doc.get("emissions");
-                  // Map<String, dynamic> waypoints = doc.get("waypoints");
-                  
+                  // List<Map<String, dynamic>> waypoints = doc.get("waypoints");
 
-                  trips.add(
-                    Padding(
-                        padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12),
-                        child: Card(
-                            elevation: 5,
-                            color: const Color(0xFFFFFFFF),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                                children: <Widget>[
-                                  Padding(
-                                      padding: const EdgeInsets.only(top: 12, right: 12, left: 12, bottom: 12),
-                                      child: Text("Distance: ${distance} km \n\nCarbon Emissions: :) kg")
-                                  ),
+                  DateTime dateTime = DateTime.parse(doc.get("date").toDate().toString());
 
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 40),
-                                    child: ButtonBar(
-                                        alignment: MainAxisAlignment.end,
-                                        children: [
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(builder: (context) => const MapPage())
-                                                );
-                                              },
-                                              child: const Text("View Route",
-                                                  style: TextStyle(
-                                                      fontSize: 14
-                                                  )),
-                                              style: ElevatedButton.styleFrom(
-                                                primary: const Color(0xFF7badab),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(40)),
-                                                minimumSize: const Size(60, 40),
-                                              )
-                                          )
-                                        ]
-                                    ),
-                                  )
-                                ]
+                  if (activeDate == null && activeDate != dateTime) {
+                    listItems.add(
+                        Padding(
+                            padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+                            child: Text(
+                                DateFormat.yMMMd().format(dateTime),
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700
+                                )
                             )
                         )
-                    ),
-                  );
+                    );
+                    activeDate = dateTime;
+                  }
+
+                  listItems.add(TripItem(distance));
                 }
               }
               return ListView(
-                    children: trips
+                    children: listItems
                 /*<Widget>[
                       const Padding(
                           padding: EdgeInsets.only(top: 12, left: 12, right: 12),
@@ -263,32 +239,54 @@ class _TripState extends State<TripPage> {
       )
     );
   }
-}
 
-class Bullet extends Text {
-  const Bullet(
-      String data, {
-        Key key,
-        TextStyle style,
-        TextAlign textAlign,
-        TextDirection textDirection,
-        Locale locale,
-        bool softWrap,
-        TextOverflow overflow,
-        double textScaleFactor,
-        int maxLines,
-        String semanticsLabel,
-      }) : super(
-    '• $data',
-    key: key,
-    style: style,
-    textAlign: textAlign,
-    textDirection: textDirection,
-    locale: locale,
-    softWrap: softWrap,
-    overflow: overflow,
-    textScaleFactor: textScaleFactor,
-    maxLines: maxLines,
-    semanticsLabel: semanticsLabel,
-  );
+  Widget TripItem(double distance) {
+    String distanceString = NumberFormat("###0.0##", "en_US").format(distance);
+
+    return Padding(
+        padding: const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12),
+        child: Card(
+            elevation: 5,
+            color: const Color(0xFFFFFFFF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+                children: <Widget>[
+                  Padding(
+                      padding: const EdgeInsets.only(top: 12, right: 12, left: 12, bottom: 12),
+                      child: Text("Distance: $distanceString km \n\nCarbon Emissions: :) kg")
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40),
+                    child: ButtonBar(
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const MapPage())
+                                );
+                              },
+                              child: const Text("View Route",
+                                  style: TextStyle(
+                                      fontSize: 14
+                                  )),
+                              style: ElevatedButton.styleFrom(
+                                primary: const Color(0xFF7badab),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40)),
+                                minimumSize: const Size(60, 40),
+                              )
+                          )
+                        ]
+                    ),
+                  )
+                ]
+            )
+        )
+    );
+  }
 }
