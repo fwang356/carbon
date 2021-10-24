@@ -8,8 +8,9 @@ import 'home_page.dart';
 import 'main.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key key, this.title}) : super(key: key);
+  const MapPage({Key key, this.title, @required this.waypoints}) : super(key: key);
   final String title;
+  final List<dynamic> waypoints;
   @override
   _MapState createState() => _MapState();
 }
@@ -38,7 +39,7 @@ class _MapState extends State<MapPage> {
     PolylineResult result = await
     polylinePoints.getRouteBetweenCoordinates(
         APIKey,
-        _start,
+        PointLatLng(widget.waypoints[0]["lat"], widget.waypoints[0]["lon"]),
         _end
     );
 

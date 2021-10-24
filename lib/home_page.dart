@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
         appBar: AppBar(
-            title: const Text("Car-Bon: Track Your Carbon Emission!"),
+            title: const Text("Overview"),
             actions: [
               ElevatedButton(
                   onPressed: () {

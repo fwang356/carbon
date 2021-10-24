@@ -16,7 +16,7 @@ class _HelpState extends State<HelpPage> {
     return Scaffold(
         appBar: AppBar(
             title: const Text(
-                "Car-Bon: How to Help!"),
+                "How to Help"),
         ),
         body: Center(
           child: SingleChildScrollView(

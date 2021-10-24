@@ -30,7 +30,7 @@ class _AuthState extends State<AuthPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-              "Car-Bon"),
+              "Log In"),
         ),
         body: Center(
             child: SingleChildScrollView(

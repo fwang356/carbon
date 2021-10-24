@@ -34,7 +34,7 @@ class _SignupState extends State<SignupPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-              "Car-Bon"),
+              "Sign Up"),
         ),
         body: Center(
             child: SingleChildScrollView(
