@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import 'dart:math';
 import 'help.dart';
 import 'trips.dart';
@@ -27,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FirebaseAuth auth = FirebaseAuth.instance;
   double weeklySum = 0;
   List<double> emissions = [];
+  DateTime today;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -36,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    DateTime today = DateTime.now();
+    today = DateTime.now();
     DateTime weekAgo = DateTime(today.year, today.month, today.day - 8);
 
     firestore.collection("users").doc(auth.currentUser.uid).collection("drives").where(
@@ -78,7 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
     Drive drive = Drive();
     drive.date = DateTime.now();
 
-    // TODO: Move initialization code
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
@@ -180,122 +181,175 @@ class _MyHomePageState extends State<MyHomePage> {
                       ))),
 
                 Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: SizedBox(
-                      width: 350,
-                      height: 200,
-                      child: LineChart(
-                        LineChartData(
-                          backgroundColor:
-                              const Color(0xfffffffa).withOpacity(0.1),
-                          gridData: FlGridData(
-                            show: true,
-                            drawVerticalLine: true,
-                            getDrawingHorizontalLine: (value) {
-                              return FlLine(
-                                color: const Color(0xff4d4e6d),
-                                strokeWidth: 1,
-                              );
-                            },
-                            getDrawingVerticalLine: (value) {
-                              return FlLine(
-                                color: const Color(0xff4d4e6d),
-                                strokeWidth: 1,
-                              );
-                            },
-                          ),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            rightTitles: SideTitles(showTitles: false),
-                            topTitles: SideTitles(showTitles: false),
-                            bottomTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 22,
-                              interval: 1,
-                              getTextStyles: (context, value) => const TextStyle(
-                                  color: Color(0xff4d4e6d),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                              getTitles: (value) {
-                                switch (value.toInt()) {
-                                  case 2:
-                                    return 'MAR';
-                                  case 5:
-                                    return 'JUN';
-                                  case 8:
-                                    return 'SEP';
-                                }
-                                return '';
-                              },
-                              margin: 8,
-                            ),
-                            leftTitles: SideTitles(
-                              showTitles: true,
-                              interval: 1,
-                              getTextStyles: (context, value) => const TextStyle(
-                                color: Color(0xff4d4e6d),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              getTitles: (value) {
-                                switch (value.toInt()) {
-                                  case 1:
-                                    return '10k';
-                                  case 3:
-                                    return '30k';
-                                  case 5:
-                                    return '50k';
-                                }
-                                return '';
-                              },
-                              reservedSize: 32,
-                              margin: 12,
-                            ),
-                          ),
-                          borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                  color: const Color(0xff4d4e6d), width: 1)),
-                          minX: 0,
-                          maxX: 11,
-                          minY: 0,
-                          maxY: 6,
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: const [
-                                FlSpot(0, 3),
-                                FlSpot(2.6, 2),
-                                FlSpot(4.9, 5),
-                                FlSpot(6.8, 3.1),
-                                FlSpot(8, 4),
-                                FlSpot(9.5, 3),
-                                FlSpot(11, 4),
-                              ],
-                              isCurved: true,
-                              colors: gradientColors,
-                              barWidth: 5,
-                              isStrokeCapRound: true,
-                              dotData: FlDotData(
-                                show: false,
-                              ),
-                              belowBarData: BarAreaData(
-                                show: true,
-                                colors: gradientColors
-                                    .map((color) => color.withOpacity(0.3))
-                                    .toList(),
-                              ),
-                            ),
-                          ],
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  child: Card(
+                    elevation: 24,
+                    color: const Color(0xFFFFFFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                          child: Text(
+                              "Past Week's Carbon Emissions: $weeklySum",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  height: 1.5)),
                         ),
-                      )),
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5, top: 16, bottom: 16, right: 30),
+                          child: SizedBox(
+                              width: 320,
+                              height: 200,
+                              child: LineChart(
+                                LineChartData(
+                                  backgroundColor:
+                                  const Color(0xfffffffa).withOpacity(0.1),
+                                  gridData: FlGridData(
+                                    show: true,
+                                    drawVerticalLine: true,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: const Color(0xff4d4e6d),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                    getDrawingVerticalLine: (value) {
+                                      return FlLine(
+                                        color: const Color(0xff4d4e6d),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    show: true,
+                                    rightTitles: SideTitles(showTitles: false),
+                                    topTitles: SideTitles(showTitles: false),
+                                    bottomTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 22,
+                                      interval: 1,
+                                      getTextStyles: (context, value) => const TextStyle(
+                                          color: Color(0xff4d4e6d),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12),
+                                      getTitles: (value) {
+                                        List<DateTime> dates = [];
+                                        for (int i = 0; i < 7; i++) {
+                                          dates.add(DateTime(today.year, today.month, today.day - i));
+                                        }
+                                        switch (value.toInt()) {
+                                          case 12:
+                                            if (dates.isEmpty) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[0]);
+                                          case 10:
+                                            if (dates.length < 2) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[1]);
+                                          case 8:
+                                            if (dates.length < 3) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[2]);
+                                          case 6:
+                                            if (dates.length < 4) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[3]);
+                                          case 4:
+                                            if (dates.length < 5) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[4]);
+                                          case 2:
+                                            if (dates.length < 6) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[5]);
+                                          case 0:
+                                            if (dates.length < 7) {
+                                              return '';
+                                            }
+                                            return DateFormat('MM/dd').format(dates[6]);
+                                        }
+                                        return '';
+                                      },
+                                      margin: 8,
+                                    ),
+                                    leftTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 1,
+                                      getTextStyles: (context, value) => const TextStyle(
+                                        color: Color(0xff4d4e6d),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                      reservedSize: 28,
+                                      margin: 12,
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                      show: true,
+                                      border: Border.all(
+                                          color: const Color(0xff4d4e6d), width: 1)),
+                                  minX: 0,
+                                  maxX: 12,
+                                  minY: 0,
+                                  maxY: 6,
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: const [
+                                        FlSpot(0, 3),
+                                        FlSpot(2.6, 2),
+                                        FlSpot(4.9, 5),
+                                        FlSpot(6.8, 3.1),
+                                        FlSpot(8, 4),
+                                        FlSpot(9.5, 3),
+                                        FlSpot(11, 4),
+                                      ],
+                                      isCurved: true,
+                                      colors: gradientColors,
+                                      barWidth: 5,
+                                      isStrokeCapRound: true,
+                                      dotData: FlDotData(
+                                        show: true,
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        colors: gradientColors
+                                            .map((color) => color.withOpacity(0.3))
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        ),
+
+                        const Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                          child: Text(
+                              "The average person emits about 88.46 kg of carbon dioxide per week from driving.",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  height: 1),
+                                  textAlign: TextAlign.center),
+                        ),
+                      ]
+                    )
+
+
+                  )
+
                 ),
 
-                const Text(
-                    "Past Week's Carbon Emissions: 0.0", // TODO: Query weekly distance from Firestore.
-                    style: TextStyle(
-                        fontSize: 20,
-                        height:
-                            1.5)), // TODO: Change distance to past week carbon emissions
 
                 Padding(
                     padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -378,31 +432,3 @@ https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-veh
 https://www.epa.gov/transportation-air-pollution-and-climate-change/what-you-can-do-reduce-pollution-vehicles-and
 https://oceanfdn.org/how-to-reduce-your-carbon-footprint-in-the-car/
 */
-
-class Bullet extends Text {
-  const Bullet(
-    String data, {
-    Key key,
-    TextStyle style,
-    TextAlign textAlign,
-    TextDirection textDirection,
-    Locale locale,
-    bool softWrap,
-    TextOverflow overflow,
-    double textScaleFactor,
-    int maxLines,
-    String semanticsLabel,
-  }) : super(
-          '• $data',
-          key: key,
-          style: style,
-          textAlign: textAlign,
-          textDirection: textDirection,
-          locale: locale,
-          softWrap: softWrap,
-          overflow: overflow,
-          textScaleFactor: textScaleFactor,
-          maxLines: maxLines,
-          semanticsLabel: semanticsLabel,
-        );
-}
