@@ -226,6 +226,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 LineChartData(
                                   backgroundColor:
                                   const Color(0xfffffffa).withOpacity(0.1),
+                                  lineTouchData: LineTouchData(
+                                    touchTooltipData: LineTouchTooltipData(
+                                      tooltipBgColor: const Color(0xfffffffa),
+                                    ),
+                                  ),
                                   gridData: FlGridData(
                                     show: true,
                                     drawVerticalLine: true,
