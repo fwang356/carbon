@@ -21,16 +21,16 @@ class _TripState extends State<TripPage> {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     firestore.collection("users").doc(auth.currentUser.uid).collection("drives").orderBy(
-        'data', descending: true
+        'date', descending: true
     ).get()
         .then((
         QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         if (trips.length < 11) {
           trips.add(doc.data() as Map);
-        }
-      });
-    }
+          }
+        });
+      }
     );
   }
 
