@@ -32,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime today;
   List<String> dates = [];
   List<FlSpot> points = [];
-  double scale;
+  String weekString;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -63,6 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
       data.add(MapEntry(d['date'], d['emission']));
     }
 
+    weekString = NumberFormat("###0.0##", "en_US").format(weeklySum);
+
     for (MapEntry entry in data) {
       int index = today.day - entry.key.toDate().day;
       emissions[index] += entry.value;
@@ -78,6 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double calculate(double distance, double mpg, String gasType) {
     double emissions;
+    print(distance);
+    print(mpg);
+    print(gasType);
     if (gasType == "Gasoline") {
       emissions = 8.887;
     } else {
@@ -143,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
       lon1 = lon2;
     }
 
-    if(drive.waypoints.length > 10 || drive.distance > 0.5) {
+    if(drive.waypoints.length > 10) {
       double mpg = 0;
       String fuelType;
 
@@ -213,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
                           child: Text(
-                              "Past Week's Carbon Emissions: $weeklySum kg",
+                              "Past Week's Carbon Emissions: $weekString kg",
                               style: const TextStyle(
                                   fontSize: 16,
                                   height: 1.5)),
