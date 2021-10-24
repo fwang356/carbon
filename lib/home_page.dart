@@ -27,8 +27,12 @@ class _MyHomePageState extends State<MyHomePage> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   double weeklySum = 0;
-  List<double> emissions = [];
+  List<MapEntry> data = [];
+  List<double> emissions = [0,0,0,0,0,0,0];
   DateTime today;
+  List<String> dates = [];
+  List<FlSpot> points = [];
+  double scale;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -38,23 +42,37 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    query();
+  }
+
+  void query() async {
     today = DateTime.now();
     DateTime weekAgo = DateTime(today.year, today.month, today.day - 8);
+    for (int i = 0; i < 7; i++) {
+      dates.add(DateFormat("MM/dd").format(
+          DateTime(today.year, today.month, today.day - i)));
+    }
 
-    firestore.collection("users").doc(auth.currentUser.uid).collection("drives").where(
-        'date', isGreaterThan: weekAgo)
-        .get()
-        .then((
-        QuerySnapshot querySnapshot) {
-          for (var doc in querySnapshot.docs) {
-            double data = (doc.data() as Map)["emissions"];
-            weeklySum += data;
-            emissions.add(data);
-          }
-    });
+    QuerySnapshot q = await firestore.collection("users").doc(
+        auth.currentUser.uid).collection("drives").where(
+        'date', isGreaterThan: weekAgo).get();
 
+    for (var doc in q.docs) {
+      Map d = (doc.data() as Map);
+      weeklySum += d["emission"];
+      data.add(MapEntry(d['date'], d['emission']));
+    }
 
+    for (MapEntry entry in data) {
+      int index = today.day - entry.key.toDate().day;
+      emissions[index] += entry.value;
+    }
+
+    for (int i = 0; i < 7; i++) {
+      points.add(FlSpot((i * 2).toDouble(), emissions[i]));
+    }
   }
+
 
   double calculate(double distance, double mpg, String gasType) {
     double emissions;
@@ -194,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
                           child: Text(
-                              "Past Week's Carbon Emissions: $weeklySum",
+                              "Past Week's Carbon Emissions: $weeklySum kg",
                               style: const TextStyle(
                                   fontSize: 16,
                                   height: 1.5)),
@@ -238,46 +256,42 @@ class _MyHomePageState extends State<MyHomePage> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12),
                                       getTitles: (value) {
-                                        List<DateTime> dates = [];
-                                        for (int i = 0; i < 7; i++) {
-                                          dates.add(DateTime(today.year, today.month, today.day - i));
-                                        }
                                         switch (value.toInt()) {
                                           case 12:
                                             if (dates.isEmpty) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[0]);
+                                            return dates[0];
                                           case 10:
                                             if (dates.length < 2) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[1]);
+                                            return dates[1];
                                           case 8:
                                             if (dates.length < 3) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[2]);
+                                            return dates[2];
                                           case 6:
                                             if (dates.length < 4) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[3]);
+                                            return dates[3];
                                           case 4:
                                             if (dates.length < 5) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[4]);
+                                            return dates[4];
                                           case 2:
                                             if (dates.length < 6) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[5]);
+                                            return dates[5];
                                           case 0:
                                             if (dates.length < 7) {
                                               return '';
                                             }
-                                            return DateFormat('MM/dd').format(dates[6]);
+                                            return dates[6];
                                         }
                                         return '';
                                       },
@@ -285,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ),
                                     leftTitles: SideTitles(
                                       showTitles: true,
-                                      interval: 1,
+                                      interval: 20,
                                       getTextStyles: (context, value) => const TextStyle(
                                         color: Color(0xff4d4e6d),
                                         fontWeight: FontWeight.bold,
@@ -302,19 +316,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                   minX: 0,
                                   maxX: 12,
                                   minY: 0,
-                                  maxY: 6,
+                                  maxY: emissions.reduce(max),
                                   lineBarsData: [
                                     LineChartBarData(
-                                      spots: const [
-                                        FlSpot(0, 3),
-                                        FlSpot(2.6, 2),
-                                        FlSpot(4.9, 5),
-                                        FlSpot(6.8, 3.1),
-                                        FlSpot(8, 4),
-                                        FlSpot(9.5, 3),
-                                        FlSpot(11, 4),
-                                      ],
-                                      isCurved: true,
+                                      spots: points,
+                                      isCurved: false,
                                       colors: gradientColors,
                                       barWidth: 5,
                                       isStrokeCapRound: true,
