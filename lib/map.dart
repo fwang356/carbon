@@ -36,16 +36,20 @@ class _MapState extends State<MapPage> {
   }
 
   void setPolylines() async {
-    PolylineResult result = await
-    polylinePoints.getRouteBetweenCoordinates(
-        APIKey,
-        PointLatLng(widget.waypoints[0]["lat"], widget.waypoints[0]["lon"]),
-        _end
-    );
+    int length = widget.waypoints.length;
+    for (int i = 0; i < length - 1; i++) {
+      int j = i + 1;
+      PolylineResult result = await
+      polylinePoints.getRouteBetweenCoordinates(
+          APIKey,
+          PointLatLng(widget.waypoints[i]["lat"], widget.waypoints[i]["lon"]),
+          PointLatLng(widget.waypoints[j]["lat"], widget.waypoints[j]["lon"])
+      );
 
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      if (result.points.isNotEmpty) {
+        for (var point in result.points) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        }
       }
     }
 
