@@ -3,6 +3,8 @@ import 'package:carbon/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'home_page.dart';
 import 'map.dart';
 
@@ -14,6 +16,27 @@ class TripPage extends StatefulWidget {
 }
 
 class _TripState extends State<TripPage> {
+  List<Map<dynamic, dynamic>> trips = [];
+
+  @override
+  void initState() {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    firestore.collection("users").doc(auth.currentUser.uid).collection("drives").orderBy(
+        'data', descending: true
+    ).get()
+        .then((
+        QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        if (trips.length < 11) {
+          trips.add(doc.data() as Map);
+        }
+      });
+    }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     FirebaseAuth auth = FirebaseAuth.instance;
