@@ -51,13 +51,15 @@ class _TripState extends State<TripPage> {
                   // List<Map<String, dynamic>> waypoints = doc.get("waypoints");
 
                   DateTime dateTime = DateTime.parse(doc.get("date").toDate().toString());
+                  DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-                  if (activeDate == null && activeDate != dateTime) {
+                  if (activeDate == null || activeDate.compareTo(date) != 0) {
+                    activeDate = date;
                     listItems.add(
                         Padding(
                             padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
                             child: Text(
-                                DateFormat.yMMMd().format(dateTime),
+                                DateFormat.yMMMd().format(activeDate),
                                 style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700
@@ -65,7 +67,6 @@ class _TripState extends State<TripPage> {
                             )
                         )
                     );
-                    activeDate = dateTime;
                   }
 
                   listItems.add(TripItem(distance));
