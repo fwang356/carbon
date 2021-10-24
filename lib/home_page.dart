@@ -32,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime today;
   List<String> dates = [];
   List<FlSpot> points = [];
-  double scale;
+  String weekString;
 
   List<Color> gradientColors = [
     const Color(0xff4d4e6d),
@@ -63,6 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
       data.add(MapEntry(d['date'], d['emission']));
     }
 
+    weekString = NumberFormat("###0.0##", "en_US").format(weeklySum);
+
     for (MapEntry entry in data) {
       int index = today.day - entry.key.toDate().day;
       emissions[index] += entry.value;
@@ -77,14 +79,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   double calculate(double distance, double mpg, String gasType) {
-    double emissions;
+    double emissionsPerGallon;
+    print(distance);
+    print(mpg);
+    print(gasType);
     if (gasType == "Gasoline") {
-      emissions = 8.887;
+      emissionsPerGallon = 8.887;
     } else {
-      emissions = 10.18;
+      emissionsPerGallon = 10.18;
     }
     double gallons = distance / (1.60834 * mpg);
-    return emissions * gallons;
+    return emissionsPerGallon * gallons;
   }
 
   double _getDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -144,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if(drive.waypoints.length > 10 && drive.distance > 0) {
-      double mpg = 0;
+      double mpg;
       String fuelType;
 
       await firestore.collection("users").doc(auth.currentUser.uid).get().then((
@@ -213,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
                           child: Text(
-                              "Past Week's Carbon Emissions: $weeklySum kg",
+                              "Past Week's Carbon Emissions: $weekString kg",
                               style: const TextStyle(
                                   fontSize: 16,
                                   height: 1.5)),
