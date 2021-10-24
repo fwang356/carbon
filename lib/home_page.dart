@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     for (int i = 0; i < 7; i++) {
-      points.add(FlSpot((i * 2).toDouble(), emissions[i]));
+      points.add(FlSpot((12 - (i * 2)).toDouble(), emissions[i]));
     }
 
     setState(() {});
