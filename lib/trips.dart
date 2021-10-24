@@ -44,7 +44,7 @@ class _TripState extends State<TripPage> {
                 DateTime activeDate;
 
                 for(QueryDocumentSnapshot<Map<String, dynamic>> doc in snapshot.data.docs) {
-                  double distance = doc.get("distance");
+                  double distance = doc.get("distance").toDouble();
 
                   // TODO: emissions and waypoints
                   // double emissions = doc.get("emissions");
